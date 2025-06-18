@@ -7,5 +7,7 @@ export interface EventType {
   banner: string;
   categories: CategoryType[];
   createdBy: UserType;
-  bannerPublicId:string;
+  bannerPublicId: string;
+  createdAt?: string;
+  updatedAt?: string;
 }

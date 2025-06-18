@@ -9,7 +9,6 @@ import {
   _getEvents,
   _updateEvent,
 } from "../services/event.service";
-import { parse } from "path";
 import { Event } from "../models/event.model";
 
 export const createEventController = async (req: Request, res: Response) => {
@@ -58,16 +57,26 @@ export const createEventController = async (req: Request, res: Response) => {
 };
 
 export const getAllEventController = async (req: Request, res: Response) => {
+  const page = req.query.page ? parseInt(req.query.page as string) : 1;
+  const pageSize = req.query.pageSize
+    ? parseInt(req.query.pageSize as string)
+    : 10;
+  const categoriesString = req?.query?.categories as string | undefined;
+  const start = req?.query?.startDate as string | undefined;
+  const end = req?.query?.endDate as string | undefined;
+  const categories = categoriesString ? categoriesString.split(",") : [];
+  const startDate = start ? start : "";
+  const endDate = end ? end : "";
   try {
-    const page = req.query.page ? parseInt(req.query.page as string) : 1;
-    const pageSize = req.query.pageSize
-      ? parseInt(req.query.pageSize as string)
-      : 10;
     const totalEvents: any = await Event.countDocuments();
 
-    const events = await Event.find()
-      .skip((page - 1) * pageSize)
-      .limit(pageSize);
+    const events = await _getEvents(
+      categories,
+      startDate,
+      endDate,
+      page,
+      pageSize
+    );
 
     const totalPages = Math.ceil(totalEvents / pageSize);
 
