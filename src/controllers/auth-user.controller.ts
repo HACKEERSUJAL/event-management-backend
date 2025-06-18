@@ -13,6 +13,7 @@ import { validateRegisterData } from "../validateSchema/auth-userSchema";
 import { UserModel } from "../models/user.model";
 import { _comparePassword, _hashPassword } from "../utils/auth/hasher";
 import { _generateToken } from "../utils/auth/token.helper";
+import { uploadImg } from "../utils/avatarHelper";
 
 export const userController = async (req: Request, res: Response) => {
   try {
@@ -20,56 +21,43 @@ export const userController = async (req: Request, res: Response) => {
       abortEarly: false,
     });
     const { username, email, password } = validateData;
-    // console.log(req.body);
-    if (!req.file || !req.file.path) {
-      return response(res, HttpStatus.BAD_REQUEST, {
-        message: "Avatar image is required",
-        data: null,
-        success: false,
-      });
-    }
 
     const existingUser = await UserModel.findOne({ email });
-
     if (existingUser) {
       return response(res, HttpStatus.BAD_REQUEST, {
-        message: "Email with this user already exists",
+        message: "Email already exists",
         data: null,
         success: false,
       });
     }
 
-    const cloudinaryResult = await cloudinary.uploader.upload(req.file.path);
-    let user;
-    // const user = await _createUser({ username, email, password, avatar });
+    const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      username
+    )}&background=random`;
+
+    const cloudinaryResult = await uploadImg(avatarUrl);
+
     const hashedPassword = await _hashPassword(password);
-    try {
-      user = await _createUser({
-        username,
-        email,
-        password: hashedPassword,
-        avatar: cloudinaryResult.secure_url,
-        avatarPublicId: cloudinaryResult.public_id,
-      });
-      // console.log(user);
-    } catch (error: any) {
-      return response(res, HttpStatus.BAD_REQUEST, {
-        message: "Failed to create user",
-        data: null,
-        success: false,
-      });
-    }
+
+    const user = await _createUser({
+      username,
+      email,
+      password: hashedPassword,
+      avatar: cloudinaryResult.secure_url,
+      avatarPublicId: cloudinaryResult.public_id,
+    });
+
     return response(res, HttpStatus.CREATED, {
       message: "User created successfully",
       data: user,
       success: true,
     });
   } catch (error: any) {
-    console.log("Unexpected error:", error);
+    console.error("Error in userController:", error);
     return response(res, HttpStatus.BAD_REQUEST, {
       message: "Unexpected error occurred",
+      data: error.errors || null,
       success: false,
-      data: error.errors,
     });
   }
 };
@@ -176,3 +164,4 @@ export const loginController = async (req: Request, res: Response) => {
     });
   }
 };
+    
