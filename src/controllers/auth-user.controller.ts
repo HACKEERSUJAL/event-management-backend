@@ -8,7 +8,6 @@ import {
   _updateUser,
 } from "../services/user.service";
 import { cloudinary } from "../utils/cloudinary";
-import fs from "fs";
 import { validateRegisterData } from "../validateSchema/auth-userSchema";
 import { UserModel } from "../models/user.model";
 import { _comparePassword, _hashPassword } from "../utils/auth/hasher";
@@ -164,4 +163,3 @@ export const loginController = async (req: Request, res: Response) => {
     });
   }
 };
-    
