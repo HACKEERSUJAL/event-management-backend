@@ -61,9 +61,9 @@ export const getAllEventController = async (req: Request, res: Response) => {
   const pageSize = req.query.pageSize
     ? parseInt(req.query.pageSize as string)
     : 10;
-  const categoriesString = req?.query?.categories as string | undefined;
-  const start = req?.query?.startDate as string | undefined;
-  const end = req?.query?.endDate as string | undefined;
+  const categoriesString = req?.query?.categories as string | "";
+  const start = req?.query?.startDate as string | "";
+  const end = req?.query?.endDate as string | "";
   const categories = categoriesString ? categoriesString.split(",") : [];
   const startDate = start ? start : "";
   const endDate = end ? end : "";
