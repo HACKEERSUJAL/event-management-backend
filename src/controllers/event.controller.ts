@@ -103,10 +103,7 @@ export const updateEventController = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { title, description, categories } = req.body;
-    // console.log(
-    //   (req as any).user,
-    //   "user from request from event controller 80"
-    // );
+ 
     const existingEvent = await _getEventById(id);
     if (!existingEvent) {
       return response(res, HttpStatus.NOT_FOUND, {
